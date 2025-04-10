@@ -1,22 +1,30 @@
 function showLoading() {
-    document.getElementById('loading-section').classList.remove('d-none');
-    document.getElementById('results').classList.add('d-none');
+    const button = document.querySelector('button[type="submit"]');
+    const buttonText = document.getElementById('button-text');
+    const buttonProgress = document.getElementById('button-progress');
+    
+    button.disabled = true;
+    buttonText.textContent = 'Calculating...';
+    buttonProgress.classList.remove('d-none');
 }
 
 function hideLoading() {
-    document.getElementById('loading-section').classList.add('d-none');
+    const button = document.querySelector('button[type="submit"]');
+    const buttonText = document.getElementById('button-text');
+    const buttonProgress = document.getElementById('button-progress');
+    
+    button.disabled = false;
+    buttonText.textContent = 'Calculate DCF';
+    buttonProgress.classList.add('d-none');
+    buttonProgress.style.width = '0%';
 }
 
 function updateProgress(percent, status) {
-    const progressBar = document.getElementById('progress-bar');
-    const statusText = document.getElementById('loading-status');
+    const buttonProgress = document.getElementById('button-progress');
+    const buttonText = document.getElementById('button-text');
     
-    progressBar.style.width = `${percent}%`;
-    progressBar.setAttribute('aria-valuenow', percent);
-    
-    if (status) {
-        statusText.textContent = status;
-    }
+    buttonProgress.style.width = `${percent}%`;
+    buttonText.textContent = status;
 }
 
 // Add function to fetch initial cash flow
@@ -295,20 +303,6 @@ document.getElementById('dcf-form').addEventListener('submit', async (e) => {
             } else {
                 document.getElementById('total_dcf_value').textContent = 'Not available';
             }
-
-            // Update external links
-            if (metrics.futu_link) {
-                const futuLink = document.getElementById('futu-link');
-                futuLink.href = metrics.futu_link;
-                futuLink.classList.remove('d-none');
-            } else {
-                document.getElementById('futu-link').classList.add('d-none');
-            }
-
-            // Update Yahoo Finance link
-            const ticker = document.getElementById('ticker').value.toUpperCase();
-            const yahooLink = document.getElementById('yahoo-link');
-            yahooLink.href = `https://finance.yahoo.com/quote/${ticker}`;
 
         }, 500);
 

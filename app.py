@@ -48,14 +48,6 @@ def get_industry_peers(ticker):
         print(f"Error getting industry peers: {str(e)}")
         return None, None, None
 
-def get_futu_link(ticker):
-    """
-    Generate a link to the Futu page for a given ticker symbol.
-    For US stocks, the format is typically: https://www.futunn.com/stock/AAPL-US
-    """
-    # Add -US suffix for US stocks
-    return f"https://www.futunn.com/stock/{ticker}-US"
-
 def calculate_dcf(ticker, growth_rate, discount_rate, perpetual_growth_rate, years=5, initial_cash_flow=None):
     try:
         # Fetch company data using yfinance
@@ -63,9 +55,6 @@ def calculate_dcf(ticker, growth_rate, discount_rate, perpetual_growth_rate, yea
         
         # Get industry peers and averages
         sector, industry_avg_pe, industry_avg_pb = get_industry_peers(ticker)
-        
-        # Get Futu link
-        futu_link = get_futu_link(ticker)
         
         # Get key statistics
         pe_ratio = company.info.get('trailingPE', None)
@@ -233,8 +222,7 @@ def calculate_dcf(ticker, growth_rate, discount_rate, perpetual_growth_rate, yea
                 "pb_historical_percentile": pb_historical_percentile,
                 "sector": sector,
                 "industry_avg_pe": industry_avg_pe,
-                "industry_avg_pb": industry_avg_pb,
-                "futu_link": futu_link
+                "industry_avg_pb": industry_avg_pb
             }
         }
     
