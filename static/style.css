@@ -1,0 +1,112 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+#results {
+    transition: all 0.3s ease;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 1rem;
+}
+
+.progress {
+    height: 25px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.progress-bar {
+    background-color: #007bff;
+    transition: width 0.5s ease;
+}
+
+#loading-status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+#loading-section .card {
+    border: none;
+}
+
+/* Add these new styles */
+.metric-card {
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.progress-wrapper {
+    text-align: right;
+}
+
+.progress {
+    margin-bottom: 4px;
+}
+
+.card-header {
+    background-color: #007bff !important;
+}
+
+.card {
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+h6 {
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.text-muted {
+    font-size: 0.875rem;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.card small.text-muted {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+#market-cap {
+    font-weight: 500;
+    color: #495057;
+}
+
+.card h4.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.card h6.card-subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+}

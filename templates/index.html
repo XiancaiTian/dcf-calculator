@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCF Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Discounted Cash Flow Calculator</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form id="dcf-form">
+                            <div class="mb-3">
+                                <label for="ticker" class="form-label">Stock Ticker</label>
+                                <input type="text" class="form-control" id="ticker" required placeholder="e.g., AAPL">
+                            </div>
+                            <div class="mb-3">
+                                <label for="initial-cash-flow" class="form-label">Initial Cash Flow Value (100M $)</label>
+                                <input type="number" class="form-control" id="initial-cash-flow" step="0.01" placeholder="e.g., 10.5">
+                                <small class="form-text text-muted">Leave empty to use the company's actual cash flow (in units of 100 million dollars)</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="growth-rate" class="form-label">Expected Growth Rate (%)</label>
+                                <input type="number" class="form-control" id="growth-rate" required step="0.1" placeholder="e.g., 10">
+                            </div>
+                            <div class="mb-3">
+                                <label for="discount-rate" class="form-label">Discount Rate (%)</label>
+                                <input type="number" class="form-control" id="discount-rate" required step="0.1" placeholder="e.g., 8">
+                            </div>
+                            <div class="mb-3">
+                                <label for="perpetual-growth-rate" class="form-label">Perpetual Growth Rate (%)</label>
+                                <input type="number" class="form-control" id="perpetual-growth-rate" required step="0.1" value="2.5" placeholder="e.g., 2.5">
+                                <small class="form-text text-muted">Typically between 2-3%, close to long-term GDP growth rate</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="years" class="form-label">Projection Years</label>
+                                <input type="number" class="form-control" id="years" required value="5" min="1" max="10">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Calculate DCF</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add this right after the form and before the results div -->
+        <div id="loading-section" class="row justify-content-center mt-4 d-none">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5>Calculating DCF Value...</h5>
+                        <div class="progress mb-3">
+                            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" 
+                                 style="width: 0%">
+                            </div>
+                        </div>
+                        <div id="loading-status" class="text-muted">
+                            Fetching financial data...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-8">
+                <div id="results" class="card d-none">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4" id="company-name"></h3>
+                        
+                        <!-- Summary Cards Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">DCF Value</h6>
+                                        <h4 class="card-title mb-0" id="dcf-per-share"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Current Price</h6>
+                                        <h4 class="card-title mb-0" id="current-price"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Total DCF Value</h6>
+                                        <h4 class="card-title mb-0" id="dcf-value"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light h-100">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-subtitle mb-2 text-muted">Market Cap</h6>
+                                        <h4 class="card-title mb-0" id="market-cap"></h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <h5>Analysis</h5>
+                            <p id="analysis"></p>
+                        </div>
+
+                        <!-- Valuation Metrics -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Valuation Metrics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="metric-card p-3 border rounded">
+                                            <h6>P/E Ratio</h6>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="pe-ratio">-</h3>
+                                                <div class="progress-wrapper">
+                                                    <div class="progress" style="width: 100px; height: 8px;">
+                                                        <div id="pe-percentile-bar" class="progress-bar" role="progressbar"></div>
+                                                    </div>
+                                                    <small id="pe-percentile" class="text-muted"></small>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Historical Percentile (10-year): <span id="pe-historical-percentile">-</span></small>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Industry Average P/E: <span id="industry-avg-pe">-</span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="metric-card p-3 border rounded">
+                                            <h6>P/B Ratio</h6>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h3 id="pb-ratio">-</h3>
+                                                <div class="progress-wrapper">
+                                                    <div class="progress" style="width: 100px; height: 8px;">
+                                                        <div id="pb-percentile-bar" class="progress-bar" role="progressbar"></div>
+                                                    </div>
+                                                    <small id="pb-percentile" class="text-muted"></small>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Historical Percentile (10-year): <span id="pb-historical-percentile">-</span></small>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Industry Average P/B: <span id="industry-avg-pb">-</span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <!-- New section for detailed financial information -->
+                        <div class="mt-4">
+                            <h5>Detailed Financial Information</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th>Initial Cash Flow Source</th>
+                                            <td id="cash-flow-source"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Initial Cash Flow Value (100M $)</th>
+                                            <td id="initial-cash-flow-result"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Shares Outstanding</th>
+                                            <td id="shares-outstanding"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Terminal Value (Present Value)</th>
+                                            <td id="terminal-value"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Projected Values Table -->
+                        <div class="mt-4">
+                            <h5>Projected Values</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Year</th>
+                                            <th>Projected Cash Flow</th>
+                                            <th>Present Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="projected-values">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
