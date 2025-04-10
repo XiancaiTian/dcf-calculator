@@ -296,6 +296,20 @@ document.getElementById('dcf-form').addEventListener('submit', async (e) => {
                 document.getElementById('total_dcf_value').textContent = 'Not available';
             }
 
+            // Update external links
+            if (metrics.futu_link) {
+                const futuLink = document.getElementById('futu-link');
+                futuLink.href = metrics.futu_link;
+                futuLink.classList.remove('d-none');
+            } else {
+                document.getElementById('futu-link').classList.add('d-none');
+            }
+
+            // Update Yahoo Finance link
+            const ticker = document.getElementById('ticker').value.toUpperCase();
+            const yahooLink = document.getElementById('yahoo-link');
+            yahooLink.href = `https://finance.yahoo.com/quote/${ticker}`;
+
         }, 500);
 
     } catch (error) {
