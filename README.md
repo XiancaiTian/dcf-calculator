@@ -45,7 +45,33 @@ A web-based Discounted Cash Flow (DCF) calculator that helps investors evaluate 
 
 ## Live Demo
 
-Visit the live demo at: [DCF Calculator](https://yourusername.github.io/dcf-calculator)
+- **Static Version**: [DCF Calculator](https://yourusername.github.io/dcf-calculator)
+- **Full Interactive Version**: [DCF Calculator App](https://dcf-calculator-app.herokuapp.com)
+
+## Deployment Options
+
+### GitHub Pages (Static Version)
+The static version of the application is hosted on GitHub Pages. To deploy:
+1. Push your code to GitHub
+2. Go to repository Settings > Pages
+3. Select the main branch as the source
+4. Save the settings
+
+### Heroku (Full Interactive Version)
+To deploy the full interactive version to Heroku:
+1. Create a Heroku account
+2. Install the Heroku CLI
+3. Run `heroku create dcf-calculator-app`
+4. Run `git push heroku main`
+
+### Render
+To deploy to Render:
+1. Create a Render account
+2. Connect your GitHub repository
+3. Create a new Web Service
+4. Select your repository
+5. Set the build command to `pip install -r requirements.txt`
+6. Set the start command to `gunicorn app:app`
 
 ## License
 
